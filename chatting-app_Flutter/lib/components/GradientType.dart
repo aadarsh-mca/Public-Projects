@@ -1,0 +1,4 @@
+enum GradientType {
+  linear,
+  radial,
+}
