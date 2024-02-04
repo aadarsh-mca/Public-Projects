@@ -7,7 +7,7 @@ final globalNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   return runApp(ChangeNotifierProvider<AudioData>(
-      create: (context) => AudioData(), child: RamMandirHistory()));
+      create: (context) => AudioData(), child: const RamMandirHistory()));
 }
 
 class RamMandirHistory extends StatelessWidget {
@@ -18,7 +18,7 @@ class RamMandirHistory extends StatelessWidget {
     return MaterialApp(
       navigatorKey: globalNavigatorKey,
       debugShowCheckedModeBanner: false,
-      home: TimelineScreen(),
+      home: const TimelineScreen(),
       // home: AudioScreen(),
     );
   }

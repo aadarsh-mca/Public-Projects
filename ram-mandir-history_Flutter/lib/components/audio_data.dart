@@ -2,10 +2,12 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ram_mandir_history_project/Model/audio_model.dart';
+import 'package:ram_mandir_history_project/components/loop_playlist.dart';
 import 'package:ram_mandir_history_project/components/player_widget.dart';
 
 /// ChangeNotifier Class to update current playing audio in [PlayerWidget]
 class AudioData extends ChangeNotifier {
+
   /// default Index of audio to be played
   int _currentIndex = 0;
 
@@ -13,26 +15,59 @@ class AudioData extends ChangeNotifier {
   String _currentAudioSource = 'ram_aayenge_female_version.mp3';
   bool _isSourceChanged = false;
 
+  /// default value for looping playlist
+  LoopPlaylist _loopPlaylist = LoopPlaylist.none;
+
   int get getCurrentIndex => _currentIndex;
   String get getCurrentAudioSource => _currentAudioSource;
   bool get isSourceChanged => _isSourceChanged;
+  LoopPlaylist get loopPlaylist => _loopPlaylist;
 
+  /// This will update the status of audio source
+  /// * [True] if audio source is changed
   void updateIsSourceChanged() {
     _isSourceChanged = !_isSourceChanged;
   }
 
-  void nextAudio() {
-    if (_currentIndex < getAudioListLength - 1) {
-      updateAudioIndexSource(_currentIndex + 1);
+  /// This will update user preference of looping the playlist
+  void updateLoopPreference() {
+    switch(_loopPlaylist) {
+      case LoopPlaylist.none :
+        _loopPlaylist = LoopPlaylist.one;
+        break; 
+      case LoopPlaylist.one :
+        _loopPlaylist = LoopPlaylist.all;
+        break;
+      case LoopPlaylist.all :
+        _loopPlaylist = LoopPlaylist.none;
+        break;
+      default :
+        _loopPlaylist = LoopPlaylist.none;
     }
   }
 
+  /// This will update the index of currently playing audio to 
+  /// [next] audio index only if the there is any audio in the list
+  void nextAudio() {
+    if (_currentIndex < getAudioPlaylistLength - 1) {
+      updateAudioIndexSource(_currentIndex + 1);
+    } 
+    /// This will be called when user choose to [Loop] complete playlist
+    // else {
+    //   updateAudioIndexSource(0);
+    // }
+  }
+
+/// This will update the index of currently playing audio to 
+/// [previous] audio index only if the there is any audio in the list
   void previousAudio() {
     if (_currentIndex > 0) {
       updateAudioIndexSource(_currentIndex - 1);
     }
   }
 
+/// This will update the index of currently playing audio
+/// also update the source path of currently playing audio
   void updateAudioIndexSource(int newIndex) {
     _isSourceChanged = true;
     _currentIndex = newIndex;
@@ -40,17 +75,20 @@ class AudioData extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get getAudioListLength {
+/// This will return the length of audio playlist
+  int get getAudioPlaylistLength {
     return _audioList.length;
   }
 
+/// This will return the Unmodifiable List<AudioData> 
+/// containing audio playlist and audio data
   UnmodifiableListView<AudioModel> get getAudioList {
     return UnmodifiableListView(_audioList);
   }
 
   final List<AudioModel> _audioList = [
     AudioModel(
-      index: 0,
+      id: 0,
       title: 'Ram Aayenge - Female Version',
       singer: 'Swati Mishra',
       lyricist: 'Late Shyam Sundar Sharma',
@@ -60,7 +98,7 @@ class AudioData extends ChangeNotifier {
           'https://lh3.googleusercontent.com/dWOcoa7UxO73xJdlQDVj00TSJuWArzh31Owhd09feXi3Aas-5WqQILPgImbGjVuTuFYZKIHq-_b7uK4',
     ),
     AudioModel(
-      index: 1,
+      id: 1,
       title: 'Mere Ghar Ram Aaye Hain',
       singer: 'Jubin Nautiyal',
       lyricist: 'Manoj Muntashir',
@@ -70,7 +108,7 @@ class AudioData extends ChangeNotifier {
           'https://lh3.googleusercontent.com/FkmpVFcgnZ3kZYB_RP-w2KlR5d7ckgSCjn3BdVzNVGs1m8FEtIYpsYjMwH_Hjj3PT2DrUbChBBIbNjsJow',
     ),
     AudioModel(
-      index: 2,
+      id: 2,
       title: 'Shri Ram Chandra Kripalu Bhajman',
       singer: 'Anuradha Paudwal',
       lyricist: 'Sant Tulsidas',
@@ -80,7 +118,7 @@ class AudioData extends ChangeNotifier {
           'https://lh3.googleusercontent.com/Pw7ls0pqU99scN4nIr6sO9cX4b9BMW6WJW0gLD1rEun-vicFmgCpRoyF84mP5hbi4jV57iWubPq8bmyt',
     ),
     AudioModel(
-      index: 3,
+      id: 3,
       title: 'Avadh Mein Laute Hai Shri Ram',
       singer: 'Sonu Nigam',
       lyricist: 'Ashutosh Agnihotri',
@@ -90,7 +128,7 @@ class AudioData extends ChangeNotifier {
           'https://lh3.googleusercontent.com/rKKufMrS34h3WhLn5Ab2axopjZM-sgPNrKSiflhw-r7CU8QBhrq9oKgd3W-CZP55D4fqxi_Hgab1j-9W',
     ),
     AudioModel(
-      index: 4,
+      id: 4,
       title: 'Ram Aayenge - Male Version',
       singer: 'Vishal Mishra',
       lyricist: 'Manoj Muntashir',

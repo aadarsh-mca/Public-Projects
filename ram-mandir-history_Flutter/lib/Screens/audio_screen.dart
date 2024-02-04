@@ -7,14 +7,10 @@ import 'package:ram_mandir_history_project/components/audio_cover_photo_card.dar
 import 'package:ram_mandir_history_project/components/player_widget.dart';
 import 'package:ram_mandir_history_project/constants.dart';
 
-class AudioScreen extends StatefulWidget {
-  AudioScreen({super.key});
+class AudioScreen extends StatelessWidget {
 
-  @override
-  State<AudioScreen> createState() => _AudioScreenState();
-}
+  const AudioScreen({super.key});
 
-class _AudioScreenState extends State<AudioScreen> {
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
@@ -65,7 +61,7 @@ class _AudioScreenState extends State<AudioScreen> {
                       SizedBox(
                         height: 220.0,
                         child: ListView.builder(
-                            itemCount: audioData.getAudioListLength,
+                            itemCount: audioData.getAudioPlaylistLength,
                             itemBuilder: (context, index) {
                               AudioModel audioModel =
                                   audioData.getAudioList[index];
@@ -78,7 +74,7 @@ class _AudioScreenState extends State<AudioScreen> {
                               );
                             }),
                       ),
-                      PlayerWidget(),
+                      const PlayerWidget(),
                     ],
                   ),
                 ),

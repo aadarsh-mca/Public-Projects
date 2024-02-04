@@ -6,6 +6,9 @@ import 'package:ram_mandir_history_project/components/audio_data.dart';
 import 'package:ram_mandir_history_project/constants.dart';
 
 class PlayerWidget extends StatefulWidget {
+
+  /// Create an audio player widget
+  /// Used to play/pause and control audio player
   const PlayerWidget({super.key});
 
   @override
@@ -17,9 +20,13 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
 
+/// Create an instance of [StreamSubscription] used to listen changes in [Duration] of audio player
   StreamSubscription? _durationSubscription;
+/// Create an instance of [StreamSubscription] used to listen changes in [Position] of audio player
   StreamSubscription? _positionSubscription;
+/// Create an instance of [StreamSubscription] used to listen changes in [State] of audio player
   StreamSubscription? _stateChangedSubscription;
+/// Create an instance of [StreamSubscription] used to listen changes in [Completion] of audio player
   StreamSubscription? _completeSubscription;
 
   bool _isPlaying = false;
@@ -57,8 +64,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
   }
 
+  /// Disposing all the instance of :
+  /// * [AudioPlayer] and
+  /// * [StreamSubscription]
   @override
   void dispose() {
+    audioPlayer.dispose();
     _stateChangedSubscription?.cancel();
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
@@ -68,16 +79,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+
+    /// Created a [Consumer<AudioData>] builder to listen changes occurred in [ChangeNotifier] class
     return Consumer<AudioData>(builder: (context, audioData, child) {
+
+      /// This will be called when 
+      /// * user change audio from [Previous], [Next] [Button] provided in [PlayerWidget] class, or
+      /// * user change audio from [ListView.builder] provided in [AudioScreen] class
       if (audioData.isSourceChanged) {
         audioPlayer.play(AssetSource(audioData.getCurrentAudioSource));
         Provider.of<AudioData>(context, listen: false).updateIsSourceChanged();
         print('source changed : ${audioData.isSourceChanged}');
       }
 
+      /// Create a widget to control audio player
       return Container(
         child: Column(
           children: [
+
+            /// Create a [SeekBar] to manually control the position of [AudioPlayer]
             Slider(
               activeColor: kSaffronColor,
               min: 0,
@@ -141,6 +161,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
   }
 
+/// * [Return] a [String] containing [Duration] in user readable format
   String getFormattedTime(int seconds) {
     String str = Duration(seconds: seconds).toString();
     return str.split(".")[0].padLeft(8, '0');

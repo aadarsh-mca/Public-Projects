@@ -11,6 +11,8 @@ class GradientText extends StatelessWidget {
   Widget? child;
   double radius;
 
+/// Create a Gradient Text widget
+/// * [required] List<Color>
   GradientText({
     super.key,
     this.gradientType,

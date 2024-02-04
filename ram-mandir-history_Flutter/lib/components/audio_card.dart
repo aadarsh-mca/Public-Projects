@@ -20,11 +20,11 @@ class AudioCard extends StatelessWidget {
       onTap: cardOnTap,
       child: Card(
         color:
-            audioData.index == Provider.of<AudioData>(context).getCurrentIndex
+            audioData.id == Provider.of<AudioData>(context).getCurrentIndex
                 ? Colors.transparent
                 : Colors.white,
         elevation:
-            audioData.index == Provider.of<AudioData>(context).getCurrentIndex
+            audioData.id == Provider.of<AudioData>(context).getCurrentIndex
                 ? 1.0
                 : 3.0,
         margin: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),

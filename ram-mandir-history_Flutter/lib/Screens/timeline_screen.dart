@@ -6,6 +6,10 @@ import 'package:ram_mandir_history_project/components/timeline_data.dart';
 import 'package:ram_mandir_history_project/constants.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
+const kAppBarTitle = 'Ram Mandir History';
+const kAppBarExpandedHeight = 220.0;
+const kPlayBhajanText = 'Play Bhajan';
+
 class TimelineScreen extends StatefulWidget {
   const TimelineScreen({super.key});
 
@@ -25,16 +29,16 @@ class _TimelineScreenState extends State<TimelineScreen> {
               backgroundColor: kSaffronColor,
               pinned: true,
               floating: true,
-              expandedHeight: 220.0,
+              expandedHeight: kAppBarExpandedHeight,
               flexibleSpace: FlexibleSpaceBar(
                 title: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   decoration: BoxDecoration(
                     color: kSaffronColor50,
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: Text(
-                    'Ram Mandir History',
+                  child: const Text(
+                    kAppBarTitle,
                     textAlign: TextAlign.end,
                     style: TextStyle(color: Colors.black),
                   ),
@@ -56,15 +60,15 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   axis: TimelineAxis.vertical,
                   alignment: TimelineAlign.manual,
                   lineXY: 0.20,
-                  indicatorStyle: IndicatorStyle(
+                  indicatorStyle: const IndicatorStyle(
                       indicatorXY: 0.07,
                       indicator: CircleAvatar(
                         backgroundColor: Colors.red,
                       )),
                   startChild: Card(
                     child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(data.startChildText),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(data.year),
                     ),
                   ),
                   endChild: Column(
@@ -81,7 +85,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(data.endChildText),
+                                Text(data.descriptionHeadingText),
                                 Icon(data.showDescription
                                     ? Icons.keyboard_arrow_up_rounded
                                     : Icons.keyboard_arrow_down_rounded),
@@ -98,7 +102,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                             child: Column(
                               children: [
                                 Text(data.decriptionText),
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                                 data.decriptionImage != null
                                     ? Image.asset(data.decriptionImage!)
                                     : Container(),
@@ -115,7 +119,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
           ],
         ),
       ),
-      floatingActionButton: TextIconButton(
+      floatingActionButton: FloatingTextIconButton(
+        label: kPlayBhajanText,
+        icon: const Icon(Icons.music_note_rounded),
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return AudioScreen();
