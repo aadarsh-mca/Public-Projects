@@ -9,8 +9,8 @@
 [History Timeline Image](https://drive.google.com/file/d/1lvXKLoUrX8OpbHg0VND72Ugc0Xy5VN4c/view?usp=sharing)
 
 <div>
-  <img src="https://github.com/aadarsh-mca/Public-Projects/tree/master/ram-mandir-history_Flutter/demo/demoC.mp4" width="200" height="400"/>
-  <img src="https://github.com/aadarsh-mca/Public-Projects/tree/master/ram-mandir-history_Flutter/demo/sDemoC.gif" width="200" height="400"/>
-  <img src="https://github.com/aadarsh-mca/Public-Projects/tree/master/ram-mandir-history_Flutter/demo/audio-player-screen.png" width="200" height="400"/>
-  <img src="https://github.com/aadarsh-mca/Public-Projects/tree/master/ram-mandir-history_Flutter/demo/timeline_screen.png" width="200" height="400"/>
+  <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/demoC.mp4" width="200" height="400"/>
+  <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/sDemoC.gif" width="200" height="400"/>
+  <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/audio-player-screen.png" width="200" height="400"/>
+  <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/timeline_screen.png" width="200" height="400"/>
 </div>
