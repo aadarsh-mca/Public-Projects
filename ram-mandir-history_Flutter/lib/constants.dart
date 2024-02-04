@@ -21,6 +21,11 @@ const kAudioMetadataStyle = TextStyle(
   fontStyle: FontStyle.italic,
 );
 
+LinearGradient sygGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: <Color>[kSaffronColor, Colors.yellow, Colors.lightGreen]);
+
 BoxDecoration kWebBoxDecor = BoxDecoration(
   borderRadius: BorderRadius.circular(10.0),
   border: Border.all(

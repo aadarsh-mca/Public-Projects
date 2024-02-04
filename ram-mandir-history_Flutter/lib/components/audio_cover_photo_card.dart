@@ -4,6 +4,8 @@ import 'package:ram_mandir_history_project/constants.dart';
 class AudioCoverPhotoCard extends StatelessWidget {
   String coverPhotoUrl;
 
+  /// Create a widget to show a cover photo while playing bhajan
+  /// * [required] Photo Url
   AudioCoverPhotoCard({required this.coverPhotoUrl, super.key});
 
   @override
@@ -11,12 +13,10 @@ class AudioCoverPhotoCard extends StatelessWidget {
     return Card(
       surfaceTintColor: Colors.white,
       margin: EdgeInsets.all(24.0),
-      elevation: 10.0,
+      elevation: 15.0,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
         child: FadeInImage(
-          // width: _deviceSize.width * 0.8,
-          // height: _deviceSize.height * 0.5,
           fit: BoxFit.fitWidth,
           image: NetworkImage(coverPhotoUrl),
           placeholder: AssetImage(kImagePlaceholder),

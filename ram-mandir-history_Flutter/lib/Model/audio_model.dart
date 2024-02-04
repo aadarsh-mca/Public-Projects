@@ -1,16 +1,14 @@
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
-
 class AudioModel {
+  int index;
   String title;
   String singer;
   String lyricist;
   String musicLabel;
   String sourcePath;
   String coverPhotoUrl;
-  // AudioPlayer audioPlayer = AudioPlayer();
 
   AudioModel({
+    required this.index,
     required this.title,
     required this.singer,
     required this.lyricist,

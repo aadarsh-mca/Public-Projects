@@ -1,265 +1,156 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:ram_mandir_history_project/components/audio_data.dart';
 import 'package:provider/provider.dart';
-import 'package:ram_mandir_history_project/Model/audio_model.dart';
-import 'package:ram_mandir_history_project/main.dart';
+import 'package:ram_mandir_history_project/components/audio_data.dart';
+import 'package:ram_mandir_history_project/constants.dart';
 
 class PlayerWidget extends StatefulWidget {
-  // int audioIndex;
-  // AudioPlayer audioPlayer;
-  // String audioPath;
-
-  //required this.audioIndex,
-  PlayerWidget({super.key});
+  const PlayerWidget({super.key});
 
   @override
   State<PlayerWidget> createState() => _PlayerWidgetState();
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  // AudioData get getAudioDataClass {
-  //   return Provider.of<AudioData>(context, listen: false);
-  // }
-  //
+  final audioPlayer = AudioPlayer();
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
 
-  int get getAudioListLength {
-    return Provider.of<AudioData>(context, listen: false).getAudioListLength;
-  }
+  StreamSubscription? _durationSubscription;
+  StreamSubscription? _positionSubscription;
+  StreamSubscription? _stateChangedSubscription;
+  StreamSubscription? _completeSubscription;
 
-  int get getCurrentPlayingIndex {
-    return Provider.of<AudioData>(context, listen: true).getCurrentIndex;
-  }
-
-  String get getCurrentAudioSource {
-    return Provider.of<AudioData>(context, listen: true).getCurrentAudioSource;
-  }
-
-  // AudioModel get getCurrentAudio {
-  //   return Provider.of<AudioData>(context, listen: false)
-  //       .getAudioList[getCurrentPlayingIndex];
-  // }
-
-  AudioPlayer player = AudioPlayer();
-  AudioPlayer get getCurrentAudioPlayer {
-    return player;
-  }
-
-  // AssetSource get getCurrentAudioSource {
-  //   return AssetSource(getCurrentAudio.sourcePath);
-  // }
-
-  PlayerState? _playerState;
-  bool get _isPlaying {
-    return _playerState == PlayerState.playing;
-  }
-
-  bool get _isPaused {
-    return _playerState == PlayerState.paused;
-  }
-
-  bool get _isStopped {
-    return _playerState == PlayerState.stopped;
-  }
-
-  late StreamSubscription _durationSubscription;
-  late StreamSubscription _positionSubscription;
-  late StreamSubscription _stateChangedSubscription;
-
-  late Duration _duration;
-  Duration _position = Duration(minutes: 0, seconds: 0);
-
-  // @override
-  // void setState(VoidCallback fn) {
-  //   if (mounted) {
-  //     super.setState(fn);
-  //   }
-  // }
+  bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    initValue();
+    audioPlayer.setSourceAsset(
+        Provider.of<AudioData>(context, listen: false).getCurrentAudioSource);
+
+    _stateChangedSubscription =
+        audioPlayer.onPlayerStateChanged.listen((newState) {
+      setState(() {
+        _isPlaying = newState == PlayerState.playing;
+      });
+    });
+
+    _durationSubscription = audioPlayer.onDurationChanged.listen((duration) {
+      setState(() {
+        _duration = duration;
+      });
+    });
+
+    _positionSubscription = audioPlayer.onPositionChanged.listen((newPosition) {
+      setState(() {
+        _position = newPosition;
+      });
+    });
+
+    _completeSubscription = audioPlayer.onPlayerComplete.listen((onComplete) {
+      setState(() {
+        _position = Duration.zero;
+        Provider.of<AudioData>(context, listen: false).nextAudio();
+      });
+    });
   }
 
   @override
   void dispose() {
-    _positionSubscription.cancel();
-    _durationSubscription.cancel();
-    _stateChangedSubscription.cancel();
+    _stateChangedSubscription?.cancel();
+    _durationSubscription?.cancel();
+    _positionSubscription?.cancel();
+    _completeSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // audioPlayer = Provider.of<AudioData>(context, listen: true)
-    //     .getAudioList[getCurrentPlayingIndex]
-    //     .audioPlayer;
-    // initValue(index: getCurrentPlayingIndex, listen: true);
+    return Consumer<AudioData>(builder: (context, audioData, child) {
+      if (audioData.isSourceChanged) {
+        audioPlayer.play(AssetSource(audioData.getCurrentAudioSource));
+        Provider.of<AudioData>(context, listen: false).updateIsSourceChanged();
+        print('source changed : ${audioData.isSourceChanged}');
+      }
 
-    return Container(
-      child: Column(
-        children: [
-          Slider(
-            value: 0.0,
-            onChanged: (newPosition) {},
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      return Container(
+        child: Column(
+          children: [
+            Slider(
+              activeColor: kSaffronColor,
+              min: 0,
+              max: _duration.inSeconds.toDouble(),
+              value: _position.inSeconds.toDouble(),
+              onChanged: (newPosition) {
+                audioPlayer.seek(Duration(seconds: newPosition.toInt()));
+                audioPlayer.resume();
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(getFormattedTime(_position.inSeconds)),
+                  Text(getFormattedTime(_duration.inSeconds)),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('0:00'),
-                Text('0:00'),
+                IconButton(
+                  onPressed: () {
+                    audioData.previousAudio();
+                  },
+                  icon: Icon(
+                    Icons.skip_previous_rounded,
+                    size: 35,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (!_isPlaying) {
+                      audioPlayer
+                          .play(AssetSource(audioData.getCurrentAudioSource));
+                    } else {
+                      pauseAudio();
+                    }
+                  },
+                  icon: Icon(
+                    _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    size: 50,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    audioData.nextAudio();
+                  },
+                  icon: Icon(
+                    Icons.skip_next_rounded,
+                    size: 35,
+                  ),
+                ),
               ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                onPressed: () {
-                  playPreviousAudio();
-                },
-                icon: Icon(
-                  Icons.skip_previous_rounded,
-                  size: 35,
-                ),
-              ),
-              IconButton(
-                onPressed: () async {
-                  if (_isPlaying) {
-                    pauseAudio();
-                  } else {
-                    resumeAudio();
-                  }
-                  // if (_isStopped) {
-                  //   await playNewAudio();
-                  // } else if (_isPlaying) {
-                  //   await pauseAudio();
-                  // } else if (_isPaused) {
-                  //   await resumeAudio();
-                  // }
-                  // playNewAudio();
-                },
-                icon: Icon(
-                  _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  size: 50,
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  playNextAudio();
-                },
-                icon: Icon(
-                  Icons.skip_next_rounded,
-                  size: 35,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void playNextAudio() {
-    // setState(() {
-    if (getCurrentPlayingIndex < getAudioListLength - 1) {
-      // disposeValue();
-      Provider.of<AudioData>(context, listen: false)
-          .updateCurrentIndex(getCurrentPlayingIndex + 1);
-      // // getAudioDataClass.updateCurrentIndex();
-      // getCurrentAudioSource = AssetSource(getCurrentAudio.sourcePath);
-      // playNewAudio();
-      // PlayerWidget(audioIndex: getCurrentPlayingIndex + 1);
-      getCurrentAudioPlayer.setSourceAsset(
-          Provider.of<AudioData>(context, listen: false).getCurrentAudioSource);
-    }
-    // });
-  }
-
-  void playPreviousAudio() async {
-    if (getCurrentPlayingIndex > 0) {
-      // await disposeValue();
-      Provider.of<AudioData>(context, listen: false)
-          .updateCurrentIndex(getCurrentPlayingIndex - 1);
-      // getAudioDataClass.updateCurrentIndex();
-      // getCurrentAudioSource = AssetSource(getCurrentAudio.sourcePath);
-      // playNewAudio();
-      // PlayerWidget(audioIndex: getCurrentPlayingIndex - 1);
-    }
-  }
-
-  Future<void> playNewAudio() async {
-    // , position: _position
-    await getCurrentAudioPlayer.play(AssetSource(
-        Provider.of<AudioData>(context, listen: false).getCurrentAudioSource));
-  }
-
-  Future<void> resumeAudio() async {
-    await getCurrentAudioPlayer.resume();
-  }
-
-  Future<void> pauseAudio() async {
-    await getCurrentAudioPlayer.pause();
-  }
-
-  void disposeValue() {
-    if (_isPlaying || _isPaused || _isStopped) {
-      _positionSubscription.cancel();
-      _durationSubscription.cancel();
-      _stateChangedSubscription.cancel();
-    }
-  }
-
-  void initValue() {
-    // audioPlayer = Provider.of<AudioData>(context, listen: listen)
-    //     .getAudioList[index]
-    //     .audioPlayer;
-    // source = AssetSource(getCurrentAudio.sourcePath);
-    // _playerState = audioPlayer.state;
-    //
-    // // audioPlayer.getDuration().then(
-    // //       (value) => setState(() {
-    // //         _duration = value!;
-    // //       }),
-    // //     );
-    // // audioPlayer.getCurrentPosition().then(
-    // //       (value) => setState(() {
-    // //         _position = value!;
-    // //       }),
-    // //     );
-
-    _stateChangedSubscription =
-        getCurrentAudioPlayer.onPlayerStateChanged.listen((newState) {
-      setState(() {
-        _playerState = newState;
-        print('Player Widget - isStopped : $_isStopped');
-        print('Player Widget - isPlaying : $_isPlaying');
-        print('Player Widget - isPaused : $_isPaused');
-      });
+          ],
+        ),
+      );
     });
-    print('Player Widget - isStopped : $_isStopped');
-    print('Player Widget - isPlaying : $_isPlaying');
-    print('Player Widget - isPaused : $_isPaused');
+  }
 
-    _durationSubscription =
-        getCurrentAudioPlayer.onDurationChanged.listen((newDuration) {
-      setState(() {
-        _duration = newDuration;
-        // print('duration : $_duration');
-      });
-    });
+  String getFormattedTime(int seconds) {
+    String str = Duration(seconds: seconds).toString();
+    return str.split(".")[0].padLeft(8, '0');
+  }
 
-    _positionSubscription =
-        getCurrentAudioPlayer.onPositionChanged.listen((newPosition) {
-      setState(() {
-        _position = newPosition;
-        // print('position : $_position');
-      });
-    });
+  void resumeAudio() {
+    audioPlayer.resume();
+  }
+
+  void pauseAudio() {
+    audioPlayer.pause();
   }
 }
-// }
