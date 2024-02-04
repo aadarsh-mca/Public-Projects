@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ram_mandir_history_project/components/audio_data.dart';
+import 'package:ram_mandir_history_project/components/repeat_playlist.dart';
 import 'package:ram_mandir_history_project/constants.dart';
 
 class PlayerWidget extends StatefulWidget {
@@ -20,16 +21,20 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
 
-/// Create an instance of [StreamSubscription] used to listen changes in [Duration] of audio player
+  /// Create an instance of [StreamSubscription] used to listen changes in [Duration] of audio player
   StreamSubscription? _durationSubscription;
-/// Create an instance of [StreamSubscription] used to listen changes in [Position] of audio player
+
+  /// Create an instance of [StreamSubscription] used to listen changes in [Position] of audio player
   StreamSubscription? _positionSubscription;
-/// Create an instance of [StreamSubscription] used to listen changes in [State] of audio player
+
+  /// Create an instance of [StreamSubscription] used to listen changes in [State] of audio player
   StreamSubscription? _stateChangedSubscription;
-/// Create an instance of [StreamSubscription] used to listen changes in [Completion] of audio player
+
+  /// Create an instance of [StreamSubscription] used to listen changes in [Completion] of audio player
   StreamSubscription? _completeSubscription;
 
   bool _isPlaying = false;
+  RepeatPlaylist _repeatStatus = RepeatPlaylist.all;
 
   @override
   void initState() {
@@ -52,6 +57,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
     _positionSubscription = audioPlayer.onPositionChanged.listen((newPosition) {
       setState(() {
+        // getTime(newPosition.inMilliseconds);
         _position = newPosition;
       });
     });
@@ -59,7 +65,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     _completeSubscription = audioPlayer.onPlayerComplete.listen((onComplete) {
       setState(() {
         _position = Duration.zero;
-        Provider.of<AudioData>(context, listen: false).nextAudio();
+        switch (_repeatStatus) {
+          case RepeatPlaylist.none:
+            audioPlayer.state = PlayerState.stopped;
+            audioPlayer.setSourceAsset(
+                Provider.of<AudioData>(context, listen: false)
+                    .getCurrentAudioSource);
+            break;
+          case RepeatPlaylist.one:
+            audioPlayer.play(AssetSource(
+                Provider.of<AudioData>(context, listen: false)
+                    .getCurrentAudioSource));
+            // print('\n\n\n\n ${audioPlayer.source}');
+            break;
+          case RepeatPlaylist.all:
+            Provider.of<AudioData>(context, listen: false).playNextAudio();
+            break;
+        }
+        // _position = Duration.zero;
       });
     });
   }
@@ -79,11 +102,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     /// Created a [Consumer<AudioData>] builder to listen changes occurred in [ChangeNotifier] class
     return Consumer<AudioData>(builder: (context, audioData, child) {
-
-      /// This will be called when 
+      /// This will be called when
       /// * user change audio from [Previous], [Next] [Button] provided in [PlayerWidget] class, or
       /// * user change audio from [ListView.builder] provided in [AudioScreen] class
       if (audioData.isSourceChanged) {
@@ -96,7 +117,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
       return Container(
         child: Column(
           children: [
-
             /// Create a [SeekBar] to manually control the position of [AudioPlayer]
             Slider(
               activeColor: kSaffronColor,
@@ -113,8 +133,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(getFormattedTime(_position.inSeconds)),
-                  Text(getFormattedTime(_duration.inSeconds)),
+                  Text(getFormattedTime(_position)),
+                  Text(getFormattedTime(_duration)),
                 ],
               ),
             ),
@@ -123,9 +143,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               children: [
                 IconButton(
                   onPressed: () {
-                    audioData.previousAudio();
+                    audioData.playShuffledAudio();
                   },
-                  icon: Icon(
+                  icon: const Icon(
+                    Icons.shuffle_rounded,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    audioData.playPreviousAudio();
+                  },
+                  icon: const Icon(
                     Icons.skip_previous_rounded,
                     size: 35,
                   ),
@@ -133,8 +161,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 IconButton(
                   onPressed: () {
                     if (!_isPlaying) {
-                      audioPlayer
-                          .play(AssetSource(audioData.getCurrentAudioSource));
+                      resumeAudio();
+                      // audioPlayer
+                      //     .play(AssetSource(audioData.getCurrentAudioSource));
                     } else {
                       pauseAudio();
                     }
@@ -146,12 +175,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                 ),
                 IconButton(
                   onPressed: () {
-                    audioData.nextAudio();
+                    audioData.playNextAudio();
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.skip_next_rounded,
                     size: 35,
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    updateLoopPreference();
+                  },
+                  icon: getRepeatIcon(),
                 ),
               ],
             ),
@@ -161,11 +196,56 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
   }
 
-/// * [Return] a [String] containing [Duration] in user readable format
-  String getFormattedTime(int seconds) {
-    String str = Duration(seconds: seconds).toString();
-    return str.split(".")[0].padLeft(8, '0');
+  /// * [Return] a [String] containing [Duration] in user readable format
+  // String getFormattedTime(int seconds) {
+  //   String str = Duration(seconds: seconds).toString();
+  //   return str.split(".")[0].padLeft(8, '0');
+  // }
+  String getFormattedTime(Duration duration) {
+    String seconds =
+        ((duration.inMilliseconds ~/ 1000) % 60).toString().padLeft(2, '0');
+    String minutes = ((duration.inMilliseconds ~/ 1000 ~/ 60) % 60).toString();
+    // print('Position ---> $minutes : $seconds :: $milliseconds');
+    return '$minutes:$seconds';
   }
+
+  Icon getRepeatIcon() {
+    switch (_repeatStatus) {
+      case RepeatPlaylist.none:
+        return const Icon(Icons.not_interested_rounded);
+      case RepeatPlaylist.one:
+        return const Icon(Icons.repeat_one_rounded, color: kSaffronColor);
+      case RepeatPlaylist.all:
+        return const Icon(Icons.repeat_rounded, color: kSaffronColor);
+    }
+  }
+
+  /// This will update user preference of looping the playlist
+  void updateLoopPreference() {
+    setState(() {
+      switch (_repeatStatus) {
+        case RepeatPlaylist.none:
+          _repeatStatus = RepeatPlaylist.one;
+          // DisplaySnackBar.showSnackMessage(context, 'Repeat 1');
+          break;
+        case RepeatPlaylist.one:
+          _repeatStatus = RepeatPlaylist.all;
+          // DisplaySnackBar.showSnackMessage(context, 'Repeat All');
+          break;
+        case RepeatPlaylist.all:
+          _repeatStatus = RepeatPlaylist.none;
+          // DisplaySnackBar.showSnackMessage(context, 'Repeat None');
+          break;
+      }
+    });
+  }
+
+  /// Create toast message
+  ///
+  /// * [Parameter] String message
+  // void displaySnackBar(String message) {
+
+  // }
 
   void resumeAudio() {
     audioPlayer.resume();

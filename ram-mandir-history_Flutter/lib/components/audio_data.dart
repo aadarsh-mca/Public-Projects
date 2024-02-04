@@ -2,8 +2,8 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ram_mandir_history_project/Model/audio_model.dart';
-import 'package:ram_mandir_history_project/components/loop_playlist.dart';
 import 'package:ram_mandir_history_project/components/player_widget.dart';
+import 'dart:math';
 
 /// ChangeNotifier Class to update current playing audio in [PlayerWidget]
 class AudioData extends ChangeNotifier {
@@ -15,13 +15,9 @@ class AudioData extends ChangeNotifier {
   String _currentAudioSource = 'ram_aayenge_female_version.mp3';
   bool _isSourceChanged = false;
 
-  /// default value for looping playlist
-  LoopPlaylist _loopPlaylist = LoopPlaylist.none;
-
   int get getCurrentIndex => _currentIndex;
   String get getCurrentAudioSource => _currentAudioSource;
   bool get isSourceChanged => _isSourceChanged;
-  LoopPlaylist get loopPlaylist => _loopPlaylist;
 
   /// This will update the status of audio source
   /// * [True] if audio source is changed
@@ -29,38 +25,23 @@ class AudioData extends ChangeNotifier {
     _isSourceChanged = !_isSourceChanged;
   }
 
-  /// This will update user preference of looping the playlist
-  void updateLoopPreference() {
-    switch(_loopPlaylist) {
-      case LoopPlaylist.none :
-        _loopPlaylist = LoopPlaylist.one;
-        break; 
-      case LoopPlaylist.one :
-        _loopPlaylist = LoopPlaylist.all;
-        break;
-      case LoopPlaylist.all :
-        _loopPlaylist = LoopPlaylist.none;
-        break;
-      default :
-        _loopPlaylist = LoopPlaylist.none;
-    }
+  /// This will play a random audio from playlist
+  void playShuffledAudio() {
+    int random = Random().nextInt(getAudioPlaylistLength);
+    updateAudioIndexSource(random);
   }
-
+  
   /// This will update the index of currently playing audio to 
   /// [next] audio index only if the there is any audio in the list
-  void nextAudio() {
+  void playNextAudio() {
     if (_currentIndex < getAudioPlaylistLength - 1) {
       updateAudioIndexSource(_currentIndex + 1);
     } 
-    /// This will be called when user choose to [Loop] complete playlist
-    // else {
-    //   updateAudioIndexSource(0);
-    // }
   }
 
 /// This will update the index of currently playing audio to 
 /// [previous] audio index only if the there is any audio in the list
-  void previousAudio() {
+  void playPreviousAudio() {
     if (_currentIndex > 0) {
       updateAudioIndexSource(_currentIndex - 1);
     }
