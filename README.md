@@ -9,6 +9,7 @@
 </div>
 
 <hr/>
+<br/>
 
 ### Play and Earn Demo App - Android / Java
 <div>
@@ -21,8 +22,9 @@
 </div>
 
 <hr/>
+<br/>
 
-### Ram Mandir History / Bhajan App - Flutter / Dart
+### Ram Mandir Audio Player / History App - Flutter / Dart
 <br/>
 
 [![Watch the demo video](https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/demoC.mp4)](https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/demoC.mp4)
