@@ -3,7 +3,8 @@
 
 <div>
   <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/sDemoC.gif" width="200" height="400"/>
-  <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/audio-player-screen.png" width="200" height="400"/>
+<!--   <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/audio-player-screen.png" width="200" height="400"/> -->
+  <img src="https://github.com/aadarsh-mca/Public-Projects/assets/114849585/b1fe2252-c649-4525-8672-c8a4c40b96e6" width="200" height="400"/>
   <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/timeline_screen.png" width="200" height="400"/>
 </div>
 <br>
