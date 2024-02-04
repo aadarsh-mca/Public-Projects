@@ -27,13 +27,12 @@
 ### Ram Mandir Audio Player / History App - Flutter / Dart
 <br/>
 
-[![Watch the demo video](https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/demoC.mp4)](https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/demoC.mp4)
-
-<br/>
-
 <div>
   <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/sDemoC.gif" width="200" height="400"/>
   <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/audio-player-screen.png" width="200" height="400"/>
   <img src="https://github.com/aadarsh-mca/Public-Projects/blob/master/ram-mandir-history_Flutter/demo/timeline_screen.png" width="200" height="400"/>
 </div>
+<br>
+
+[App Demo Video.webm](https://github.com/aadarsh-mca/Public-Projects/assets/114849585/d2898e1e-9f02-4f71-af49-55ae5355055b)
 
