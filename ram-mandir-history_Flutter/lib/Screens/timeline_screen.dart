@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:ram_mandir_history_project/Model/timeline_model.dart';
 import 'package:ram_mandir_history_project/Screens/audio_screen.dart';
@@ -122,10 +123,19 @@ class _TimelineScreenState extends State<TimelineScreen> {
       floatingActionButton: FloatingTextIconButton(
         label: kPlayBhajanText,
         icon: const Icon(Icons.music_note_rounded),
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return AudioScreen();
-          }));
+        onTap: () async {
+          String url =
+              // 'https://drive.google.com/file/d/1eOcge9W1axhfilvkpGLvJBxbvzV_mEVa';
+              'https://firebasestorage.googleapis.com/v0/b/flash-chat-flutter-app-2121c.appspot.com/o/Has%20ke%20gujari%20ja.mp3?alt=media&token=175bd72e-6598-4e2c-ba4f-cf0a03a55480';
+          AudioPlayer player = AudioPlayer();
+          await player.setSourceUrl(url);
+          player.resume();
+
+          print(player.source);
+
+          // Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          //   return AudioScreen();
+          // }));
         },
       ),
     );
